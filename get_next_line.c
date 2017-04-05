@@ -13,19 +13,23 @@ void	build_str(char **str, char *buff, int fd)
 	free(str[fd]);
 	str[fd] = ft_strdup(tmp);
 	free(tmp);
-	ft_bzero(buff, BUFF_SIZE);
+	ft_bzero(buff, BUFF_SIZE + 1);
 }
 
 int		get_next_line(const int fd, char **line)
 {
-	char			buff[BUFF_SIZE];
+	char			buff[BUFF_SIZE + 1];
 	char			*end_line;
+	int				nb_bytes;
 	static char		*str[4864];
 
 	if (fd < 0 || !line || BUFF_SIZE == 0)
 		return (-1);
-	while ((read(fd, &buff, BUFF_SIZE)) != 0)
+	while ((nb_bytes = read(fd, &buff, BUFF_SIZE)) != 0)
 	{
+		buff[nb_bytes] = '\0';
+		if (nb_bytes < 0)
+			return (-1);
 		build_str(str, buff, fd);
 		if ((end_line = ft_strchr(str[fd], '\n')))
 		{
@@ -33,7 +37,5 @@ int		get_next_line(const int fd, char **line)
 			return (1);
 		}
 	}
-	if (!str[fd])
-		return (0);
 	return (0);
 }
