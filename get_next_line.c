@@ -25,17 +25,24 @@ int		get_next_line(const int fd, char **line)
 
 	if (fd < 0 || !line || BUFF_SIZE == 0)
 		return (-1);
-	while ((nb_bytes = read(fd, &buff, BUFF_SIZE)) != 0)
+	while ((nb_bytes = read(fd, &buff, BUFF_SIZE)) >= 0)
 	{
-		buff[nb_bytes] = '\0';
 		if (nb_bytes < 0)
 			return (-1);
+		buff[nb_bytes] = '\0';
 		build_str(str, buff, fd);
 		if ((end_line = ft_strchr(str[fd], '\n')))
 		{
 			*line = ft_strndup(str[fd], (end_line - str[fd]));
+			str[fd] = ft_strdup(end_line + 1);
 			return (1);
 		}
+		else if (nb_bytes == 0  && str[fd])
+		{
+			*line = ft_strdup(str[fd]);
+			free(str[fd]);
+			return (0);
+		}
 	}
-	return (0);
+	return (-1);
 }
