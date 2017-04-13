@@ -6,24 +6,24 @@
 /*   By: lyoung <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/06 15:23:05 by lyoung            #+#    #+#             */
-/*   Updated: 2017/04/11 11:12:45 by lyoung           ###   ########.fr       */
+/*   Updated: 2017/04/13 13:09:17 by lyoung           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-void	build_str(char **str, char *buff, int fd)
+void	build_str(char **str, char *buff)
 {
 	char	*tmp;
 
-	if (!str[fd])
+	if (!*str)
 	{
-		str[fd] = ft_strdup(buff);
+		*str = ft_strdup(buff);
 		return ;
 	}
-	tmp = ft_strjoin(str[fd], buff);
-	free(str[fd]);
-	str[fd] = ft_strdup(tmp);
+	tmp = ft_strjoin(*str, buff);
+	free(*str);
+	*str = ft_strdup(tmp);
 	free(tmp);
 	ft_bzero(buff, BUFF_SIZE + 1);
 }
@@ -42,9 +42,9 @@ int		end_of_file(char **str, int fd, char **line)
 	{
 		*line = ft_strdup(str[fd]);
 		ft_bzero(str[fd], ft_strlen(str[fd]));
+		free(str[fd]);
 		return (1);
 	}
-
 }
 
 int		get_next_line(const int fd, char **line)
@@ -61,10 +61,11 @@ int		get_next_line(const int fd, char **line)
 		if (nb_bytes < 0)
 			return (-1);
 		buff[nb_bytes] = '\0';
-		build_str(str, buff, fd);
+		build_str(&str[fd], buff);
 		if ((end_line = ft_strchr(str[fd], '\n')))
 		{
 			*line = ft_strndup(str[fd], (end_line - str[fd]));
+			free(str[fd]);
 			str[fd] = ft_strdup(end_line + 1);
 			return (1);
 		}
